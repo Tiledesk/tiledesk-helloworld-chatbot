@@ -20,6 +20,46 @@ app.post('/bot', (req, res) => {
   tdclient.sendMessage(msg);
 });
 
+// Alternative chatbot endpoint with raw http call
+app.post('/rawbot', (req, res) => {
+  let body = req.body;
+  let token = body.token;
+  let enduser_text = body.payload.text;
+  let tiledesk_request = body.payload.request;
+  let project_id = body.payload.id_project;
+  let request_id = tiledesk_request.request_id
+  let bot_name = tiledesk_request.department.bot.name;
+  
+  // immediatly reply to TILEDESK
+  res.status(200).send({"success":true});
+
+  // Reply service is asynchronous.
+  // Once you get the request token you can write to this
+  // conversation as many times as you want
+  
+  const endpoint =
+    "https://api.tiledesk.com/v2";
+  let msg = {
+    "text": "Hello from chatbot!",
+    "type": "text",
+    "senderFullname": bot_name // you can change the chatbot name here
+  }
+  
+  request({
+    url: `${endpoint}/${project_id}/requests/${request_id}/messages`,
+    headers: {
+      'Content-Type' : 'application/json',
+      'Authorization': 'JWT '+token
+    },
+    json: msg,
+    method: 'POST'
+    },
+    function(err, res, resbody) {
+      console.log("Message sent.")
+    }
+  );
+})
+
 app.listen(3000, () => {
   console.log('server started');
 });
