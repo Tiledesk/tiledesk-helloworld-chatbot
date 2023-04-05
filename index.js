@@ -38,7 +38,7 @@ app.post('/rawbot', (req, res) => {
   // conversation as many times as you want
   
   const endpoint =
-    "https://api.tiledesk.com/v2";
+    "https://api.tiledesk.com/v3";
   let msg = {
     "text": "Hello from chatbot!",
     "type": "text",
