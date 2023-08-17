@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const axios = require('axios');
 const { TiledeskChatbotClient } = require('@tiledesk/tiledesk-chatbot-client');
 
 const app = express();
@@ -30,7 +31,7 @@ app.post('/rawbot', (req, res) => {
   let request_id = tiledesk_request.request_id
   let bot_name = tiledesk_request.department.bot.name;
   
-  // immediatly reply to TILEDESK
+  // immediately reply to TILEDESK
   res.status(200).send({"success":true});
 
   // Reply service is asynchronous.
@@ -45,19 +46,18 @@ app.post('/rawbot', (req, res) => {
     "senderFullname": bot_name // you can change the chatbot name here
   }
   
-  request({
-    url: `${endpoint}/${project_id}/requests/${request_id}/messages`,
+  axios.post(`${endpoint}/${project_id}/requests/${request_id}/messages`, msg, {
     headers: {
       'Content-Type' : 'application/json',
       'Authorization': 'JWT '+token
-    },
-    json: msg,
-    method: 'POST'
-    },
-    function(err, res, resbody) {
-      console.log("Message sent.")
     }
-  );
+  })
+  .then(response => {
+    console.log("Message sent.");
+  })
+  .catch(error => {
+    console.error("Error sending message:", error);
+  });
 })
 
 app.listen(3000, () => {
